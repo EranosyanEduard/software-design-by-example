@@ -43,6 +43,22 @@ describe('тест утилиты "copy_file.one"', () => {
     await expect(fs.readFile('./user/green.bck', 'utf-8')).resolves.toBe('')
   })
 
+  it('не должен создать копию файла с указанным расширением, если файл - это каталог', async () => {
+    expect.hasAssertions()
+
+    /** @type {Readonly<CopyFileInput>} */
+    const fixture = {
+      filePath: './user',
+      newExtension: '.bck',
+      oldExtension: '.txt'
+    }
+
+    await expect(copyFile(fixture)).resolves.toBeUndefined()
+    await expect(fs.exists('./user')).resolves.toBeTruthy()
+    await expect(fs.exists('./user.bck')).resolves.toBeFalsy()
+    await expect(fs.exists('./user.txt')).resolves.toBeFalsy()
+  })
+
   it('должен выбросить исключение, если файла не существует', async () => {
     expect.hasAssertions()
 
