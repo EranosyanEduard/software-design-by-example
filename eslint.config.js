@@ -7,7 +7,7 @@ export default [
   { languageOptions: { globals: globals.node } },
   pluginJs.configs.recommended,
   {
-    files: ['**/*.test.ts'],
+    files: ['**/*.test.js'],
     languageOptions: { globals: vitest.environments.env.globals },
     plugins: { vitest },
     rules: vitest.configs.all.rules,

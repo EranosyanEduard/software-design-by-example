@@ -3,6 +3,8 @@
     "checkJs": true,
     "target": "ESNext",
     "lib": ["ESNext"],
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
     "noUncheckedIndexedAccess": true,
     "strictNullChecks": true
   }
