@@ -10,7 +10,6 @@ export default [
     files: ['**/*.test.js'],
     languageOptions: { globals: vitest.environments.env.globals },
     plugins: { vitest },
-    rules: vitest.configs.all.rules,
-    settings: { vitest: { typecheck: true } }
+    rules: vitest.configs.all.rules
   }
 ]
