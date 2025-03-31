@@ -1,6 +1,7 @@
 import fs from 'fs-extra'
 import { env } from 'node:process'
 import * as backupConfigApi from './backup_config.js'
+import defaultHashFile from './hash_file.js'
 import * as manifestApi from './manifest.js'
 import findNew from './check-existing-files.js'
 import hashExisting from './hash-existing-async.js'
@@ -13,7 +14,7 @@ const DEFAULT_MANIFEST_OPTIONS = {
 
 /** @type {import('./backup.d.ts').Backup} */
 const backup = async (opts) => {
-  const { dst, src, manifest: optionalManifest } = opts
+  const { dst, hashFile = defaultHashFile, src, manifest: optionalManifest } = opts
   const config = await backupConfigApi.read(dst)
   const manifest = {
     ...DEFAULT_MANIFEST_OPTIONS,
@@ -22,7 +23,7 @@ const backup = async (opts) => {
   const manifestId = Number.isNaN(manifest.id)
     ? config.lastManifestId.toString().padStart(10, '0')
     : manifest.id.toString()
-  const existing = await hashExisting(src)
+  const existing = await hashExisting({ hashFile, rootDir: src })
   const needToCopy = await findNew(dst, existing)
   await copyFiles(dst, needToCopy)
   await manifestApi.create({

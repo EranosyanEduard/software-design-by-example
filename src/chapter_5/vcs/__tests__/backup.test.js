@@ -1,5 +1,7 @@
+import fs from 'fs-extra'
 import { glob } from 'glob'
 import mock from 'mock-fs'
+import { env } from 'node:process'
 import { describe, expect, it } from 'vitest'
 import backup from '../backup.js'
 
@@ -74,6 +76,49 @@ describe('тест функции "backup"', () => {
     expect(sortAlphabeticalOrder(await glob('backup/*.json'))).toStrictEqual([
       'backup/0000000001.json',
       'backup/0000000003.json'
+    ])
+
+    /* after */
+    afterEach_()
+  })
+
+  it('должен использовать пользовательскую функцию для хеширования файлов', async () => {
+    expect.hasAssertions()
+
+    /* before */
+    /**
+     * @param {string} filePath
+     * @returns {Promise<[string, Record<string, string>]>}
+     */
+    const jsonManifestPathContentPair = async (filePath) => {
+      const json = await fs.readFile(filePath, 'utf-8')
+      return [filePath, JSON.parse(json)]
+    }
+    beforeEach_()
+
+    /* test */
+    await backup({
+      dst: 'backup',
+      hashFile: (fileContent) => fileContent.slice(0, 3),
+      src: 'src',
+      manifest: { fileExtension: 'json' }
+    })
+
+    const manifestsFilePaths = await glob('backup/*.json')
+    const manifestsPathContentPairs = await Promise.all(
+      manifestsFilePaths.map(jsonManifestPathContentPair)
+    )
+
+    expect(manifestsPathContentPairs).toStrictEqual([
+      [
+        'backup/0000000000.json',
+        {
+          'src/colors/red': 'red',
+          'src/colors/green': 'gre',
+          'src/colors/blue': 'blu',
+          username: env.USERNAME
+        }
+      ]
     ])
 
     /* after */

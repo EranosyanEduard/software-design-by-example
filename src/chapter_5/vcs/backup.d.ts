@@ -1,6 +1,9 @@
+import type { HashFile } from './hash_file.d.ts'
+
 export interface BackupOptions {
   readonly dst: string
   readonly src: string
+  readonly hashFile?: HashFile
   readonly manifest?: Partial<ManifestOptions>
 }
 

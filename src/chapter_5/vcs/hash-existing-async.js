@@ -1,5 +1,4 @@
 import fs from 'fs-extra'
-import crypto from 'crypto'
 import { glob } from 'glob'
 
 // [main]
@@ -13,21 +12,14 @@ const readPath = async (path) => {
   return [path, content]
 }
 
-const hashPath = (path, content) => {
-  const hasher = crypto.createHash('sha1').setEncoding('hex')
-  hasher.write(content)
-  hasher.end()
-  return [path, hasher.read()]
-}
-
-const hashExisting = async (rootDir) => {
+const hashExisting = async ({ hashFile, rootDir }) => {
   const pattern = `${rootDir}/**/*`
   const options = {}
   const matches = await glob(pattern, options)
   const stats = await Promise.all(matches.map((path) => statPath(path)))
   const files = stats.filter(([, stat]) => stat.isFile())
   const contents = await Promise.all(files.map(([path]) => readPath(path)))
-  const hashes = contents.map(([path, content]) => hashPath(path, content))
+  const hashes = contents.map(([path, content]) => [path, hashFile(content)])
   return hashes
 }
 // [/main]
